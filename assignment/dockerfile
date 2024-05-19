@@ -1,22 +1,7 @@
-FROM eclipse-temurin:17-jdk-jammy AS dependencies
+FROM openjdk:17 
 WORKDIR /app
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
 RUN sed -i 's/\r$//' mvnw
-RUN ./mvnw dependency:go-offline
-
-
-FROM dependencies AS build
 COPY src ./src
-RUN ./mvnw package -DskipTests
-
-
-RUN ls -l target
-RUN mv target/*.jar target/app.jar
-
-
-FROM eclipse-temurin:17-jre-jammy
-WORKDIR /app
-COPY --from=build /app/target/app.jar app.jar
-EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+CMD ["./mvnw", "spring-boot:run"]
